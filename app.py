@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 
 # PostgreSQL connection from Render environment variables
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("postgresql://image_logs_db_user:o7Bz04na8qRaMpHwDNCyp4V3nKEpgbMw@dpg-cufjhl3tq21c73f6ldog-a/image_logs_db")
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL is not set. Please configure it in Render.")
 
@@ -53,7 +53,7 @@ def view_logs():
 @app.route("/clear_logs", methods=["POST"])
 def clear_logs():
     """ Clear all logs securely with a secret key """
-    SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
+    SECRET_KEY = os.getenv("test_1", "1223334444")
     key = request.args.get("key")
     
     if key != SECRET_KEY:
