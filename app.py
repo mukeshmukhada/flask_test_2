@@ -5,20 +5,15 @@ import os
 
 app = Flask(__name__)
 
-# PostgreSQL connection from Render environment variables
-DATABASE_URL = os.getenv("postgresql://image_logs_db_user:o7Bz04na8qRaMpHwDNCyp4V3nKEpgbMw@dpg-cufjhl3tq21c73f6ldog-a/image_logs_db")
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL is not set. Please configure it in Render.")
+# PostgreSQL connection string from Render
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://image_logs_db_user:o7Bz04na8qRaMpHwDNCyp4V3nKEpgbMw@dpg-cufjhl3tq21c73f6ldog-a/image_logs_db")
 
-# Ensure compatibility with SQLAlchemy
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
-
+# Configure SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
-# Define the database model
+# Define the Logs table
 class AccessLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(50))
@@ -26,18 +21,18 @@ class AccessLog(db.Model):
     user_agent = db.Column(db.String(500))
     email = db.Column(db.String(255))  # Store recipient's email
 
-# Initialize database tables
+# Create the database tables (only needed once)
 with app.app_context():
     db.create_all()
 
 @app.route("/image")
 def serve_image():
-    """ Tracking pixel route that logs email opens """
+    """ Tracking pixel that logs email opens """
     ip = request.headers.get("X-Forwarded-For", request.remote_addr).split(",")[0].strip()
     user_agent = request.headers.get("User-Agent")
-    email = request.args.get("email", "unknown")  # Get email identifier from URL
+    email = request.args.get("email", "unknown")  # Get recipient email from URL
 
-    # Save log entry
+    # Save log to the database
     log_entry = AccessLog(ip=ip, user_agent=user_agent, email=email)
     db.session.add(log_entry)
     db.session.commit()
@@ -52,7 +47,7 @@ def view_logs():
 
 @app.route("/clear_logs", methods=["POST"])
 def clear_logs():
-    """ Clear all logs securely with a secret key """
+    """ Secure log deletion using a secret key """
     SECRET_KEY = os.getenv("test_1", "1223334444")
     key = request.args.get("key")
     
