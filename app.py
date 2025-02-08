@@ -45,7 +45,7 @@ def view_logs():
     logs = AccessLog.query.order_by(AccessLog.timestamp.desc()).limit(10).all()
     return "<br>".join([f"{log.timestamp} - {log.email} - {log.ip} - {log.user_agent}" for log in logs])
 
-@app.route("/clear_logs", methods=["POST"])
+@app.route("/clear_logs")
 def clear_logs():
     """ Secure log deletion using a secret key """
     SECRET_KEY = os.getenv("test_1", "1223334444")
