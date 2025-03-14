@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 
 # PostgreSQL connection string from Render
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://image_logs_db_2_user:jfKei3QhpBfcvJdalnovfssSyuzQTqUu@dpg-cugev3tumphs73cqjb40-a/image_logs_db_2")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://flask_test_2_user:mdIYnveFnJGl2kpNZjvoB4XLam0sV09Y@dpg-cv9vped6l47c739g225g-a/flask_test_2")
 
 # Configure SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
